@@ -97,7 +97,29 @@ def agregar_pais(paises):
     }
     paises.append(pais)
     print(f"Se agrego el pais: {nombre} correctamente")
+
+def buscar_porcision(paises, nombre):
+    for i in range(len(paises)):
+        if paises[i]["nombre"].lower() == nombre.lower():
+            return i
+    return -1
+
+def actualizar_pais(paises):
+    print("Actualizar pais")
+    nombre=validar_texto("Ingrese el nombre del pais que desea actualizar: ")
+    posicion =buscar_porcision(paises, nombre)
+    if posicion ==-1:
+        print(f"Error; no se encontro el pais ingresado: {nombre}")
+        return
+    pais=paises[posicion]
+    print(f"Datos actuales: {pais['nombre']} | {pais['poblacion']} | {pais['superficie']} | {pais['continente']}")
+    nueva_poblacion=validar_numero(f"Ingrese la nueva poblacion de {nombre}: ")
+    nueva_superficie=validar_numero(f"Ingrese la nueva superficie de {nombre}: ")
     
+    pais["poblacion"] = nueva_poblacion
+    pais["superficie"] = nueva_superficie
+    print(f"Los datos del pais {pais['nombre']} se actualizaron correctamente")
+
 def main():
     paises = cargar_paises("paises.csv")
     print(f"Se cargaron {len(paises)} países")
@@ -109,7 +131,7 @@ def main():
             case "1":
                 agregar_pais(paises)
             case "2":
-                pass
+                actualizar_pais(paises)
             case "3":
                 pass
             case "4":
