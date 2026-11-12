@@ -58,6 +58,13 @@ def mostrar_paises(paises):
     for pais in paises:
         print(f"{pais['nombre']} | {pais['poblacion']} | {pais['superficie']} | {pais['continente']}")
 
+def validar_texto(mensaje):
+    texto = input(mensaje).strip()
+    while texto == "":
+        print("Error: No puede estar vacio el campo")
+        texto = input(mensaje).strip()
+    return texto
+
 def main():
     paises = cargar_paises("paises.csv")
     print("Se cargaron", len(paises), "países")
