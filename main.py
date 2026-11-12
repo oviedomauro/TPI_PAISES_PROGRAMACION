@@ -17,7 +17,7 @@ def cargar_paises(ruta):
         with open(ruta, "r", encoding="utf-8") as archivo:
             lineas = archivo.readlines()
     except FileNotFoundError:
-        print("Error: no se encontró el archivo", ruta)
+        print(f"Error: no se encontró el archivo {ruta}")
         return paises
 
     for i in range(1, len(lineas)):
@@ -27,19 +27,19 @@ def cargar_paises(ruta):
 
         partes = linea.split(",")
         if len(partes) != 4:
-            print("Línea", i + 1, "ignorada: formato incorrecto")
+            print(f"Linea {i + 1} ignorada: formato incorrecto")
             continue
         
         nombre = partes[0].strip()
         continente = partes[3].strip()
         if nombre == "" or continente == "":
-            print("Línea", i + 1, "ignorada: hay campos vacíos")
+            print(f"Línea {i + 1} ignorada: hay campos vacíos")
             continue
         try:
             poblacion = int(partes[1])
             superficie = int(partes[2])
         except ValueError:
-            print("Línea", i + 1, "ignorada: población o superficie no son números")
+            print(f"Línea {i + 1} ignorada: población o superficie no son números")
             continue
         pais = {
             "nombre": nombre,
@@ -80,17 +80,34 @@ def validar_numero(mensaje):
             print("Error: Debe ingresar un numero entero mayor a cero")
             continue
         return numero
-            
+    
+def agregar_pais(paises):
+    print("")
+    print("Agregar pais")
+    nombre = validar_texto("ingrese el nombre del pais: ")
+    poblacion = validar_numero(f"Ingrese la poblacion de {nombre}: ")
+    superficie = validar_numero(f"Ingrese la superficie de {nombre}: ")
+    continente= validar_texto(f"Ingrese el continente donde se encuentra {nombre}")
+    
+    pais= {
+        "nombre": nombre,
+        "poblacion": poblacion,
+        "superficie": superficie,
+        "continente": continente
+    }
+    paises.append(pais)
+    print(f"Se agrego el pais: {nombre} correctamente")
+    
 def main():
     paises = cargar_paises("paises.csv")
-    print("Se cargaron", len(paises), "países")
+    print(f"Se cargaron {len(paises)} países")
     opcion = ""
     while opcion != "0":
         mostrar_menu()
         opcion = input("Elegi una opcion: ")
         match opcion:
             case "1":
-                pass
+                agregar_pais(paises)
             case "2":
                 pass
             case "3":
@@ -105,7 +122,7 @@ def main():
                 mostrar_paises(paises)
             case "0":
                 print("Saliendo del programa...")
-                
+                break
             case _:
                 print("Opcion invalida , vuelva a intentarlo")
 main()
