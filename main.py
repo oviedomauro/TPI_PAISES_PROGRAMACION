@@ -65,6 +65,22 @@ def validar_texto(mensaje):
         texto = input(mensaje).strip()
     return texto
 
+def validar_numero(mensaje):
+    while True:
+        dato = input(mensaje).strip()
+        try:
+            numero = int(dato)
+        except ValueError:
+            print("Error: Debe ingresar un numero entero")
+            continue
+        if numero < 0:
+            print("Error: Debe ingresar un numero entero positivo")
+            continue
+        if numero <= 0:
+            print("Error: Debe ingresar un numero entero mayor a cero")
+            continue
+        return numero
+            
 def main():
     paises = cargar_paises("paises.csv")
     print("Se cargaron", len(paises), "países")
