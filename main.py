@@ -7,6 +7,7 @@ def mostrar_menu():
     print("4. Filtrar paises")
     print("5. Ordenar paises")
     print("6. Mostrar estadisticas")
+    print("7. Mostrar todos los paises")
     print("0. Salir")
 
 
@@ -49,6 +50,14 @@ def cargar_paises(ruta):
         paises.append(pais)
     return paises
 
+def mostrar_paises(paises):
+    if len(paises) == 0:
+        print("No hay paises para mostrar")
+        return
+    print("Nombre | Poblacion | Superficie | Continente")
+    for pais in paises:
+        print(f"{pais['nombre']} | {pais['poblacion']} | {pais['superficie']} | {pais['continente']}")
+
 def main():
     paises = cargar_paises("paises.csv")
     print("Se cargaron", len(paises), "países")
@@ -69,6 +78,8 @@ def main():
                 pass
             case "6":
                 pass
+            case "7":
+                mostrar_paises(paises)
             case "0":
                 print("Saliendo del programa...")
                 
