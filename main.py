@@ -120,6 +120,19 @@ def actualizar_pais(paises):
     pais["superficie"] = nueva_superficie
     print(f"Los datos del pais {pais['nombre']} se actualizaron correctamente")
 
+def buscar_pais_por_nombre(paises):
+    print(f"Buscar pais por nombre")
+    nombre= validar_texto("Ingrese nombre o parte del nombre del pais que desea buscar: ")
+    resultados = []
+    for pais in paises:
+        if nombre.lower() in pais["nombre"].lower():
+            resultados.append(pais)
+    if len(resultados) ==0:
+        print(f"No se ha encontrado ningun pais que contenga: {nombre}")
+    else:
+        print(f"Se han encontrado {len(resultados)} paises que contienen: {nombre}")
+        mostrar_paises(resultados)
+
 def main():
     paises = cargar_paises("paises.csv")
     print(f"Se cargaron {len(paises)} países")
@@ -133,7 +146,7 @@ def main():
             case "2":
                 actualizar_pais(paises)
             case "3":
-                pass
+                buscar_pais_por_nombre(paises)
             case "4":
                 pass
             case "5":
