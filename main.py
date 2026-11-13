@@ -165,6 +165,26 @@ def filtrar_continente(paises):
         print(f"Se han encontrado {len(resultados)} paises en el continente: {continente}")
         mostrar_paises(resultados)
         
+def filtrar_rango_poblacion_superficie(paises, campo):
+    print(f"Filtrar por {campo}")
+    min = validar_numero(f"Ingrese el valor minimo de {campo}: ")
+    max = validar_numero(f"Ingrese el valor maximo de {campo}: ")
+    
+    if min > max:
+        print(f"Error: el minimo ({min}) no puede ser mayor que el maximo ({max})")
+        return
+    resultados = []
+    
+    for pais in paises:
+        if pais[campo] >= min and pais[campo]<= max:
+            resultados.append(pais)
+            
+    if len(resultados)==0:
+        print(f"No se han encontrado paises con {campo} entre {min} y {max}")
+    else:
+        print(f"Se han encontrado {len(resultados)} paises con {campo} entre {min} y {max}")
+        mostrar_paises(resultados)
+
 def filtrar_paises(paises):
     opcion= ""
     while opcion != "0":
@@ -174,9 +194,9 @@ def filtrar_paises(paises):
             case "1":
                 filtrar_continente(paises)
             case "2":
-                pass
+                filtrar_rango_poblacion_superficie(paises, "poblacion")
             case "3":
-                pass
+                filtrar_rango_poblacion_superficie(paises, "superficie")
             case "0":
                 print("Volviendo al menu principal")
             case _:
