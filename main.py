@@ -132,7 +132,56 @@ def buscar_pais_por_nombre(paises):
     else:
         print(f"Se han encontrado {len(resultados)} paises que contienen: {nombre}")
         mostrar_paises(resultados)
+def obtener_continentes(paises):
+    continentes=[]
+    for pais in paises:
+        if pais["continente"] not in continentes:
+            continentes.append(pais["continente"])
+    return continentes
 
+def mostrar_menu_de_filtro():
+    print("Filtrar paises")
+    print("1. Filtrar por continente")
+    print("2. Filtrar por poblacion")
+    print("3. Filtrar por superficie")
+    print("0. Volver al menu principal")
+    
+def filtrar_continente(paises):
+    print("Filtrar por continente")
+    print("Continentes disponibles:")
+    
+    for continente in obtener_continentes(paises):
+        print(f"- {continente}")
+    continente = validar_texto("Ingrese el continente por el que desea filtrar: ")
+    resultados= []
+    
+    for pais in paises:
+        if pais["continente"].lower()== continente.lower():
+            resultados.append(pais)
+            
+    if len(resultados)==0:
+        print(f"No se han encontrado paises en el continente: {continente}")
+    else:
+        print(f"Se han encontrado {len(resultados)} paises en el continente: {continente}")
+        mostrar_paises(resultados)
+        
+def filtrar_paises(paises):
+    opcion= ""
+    while opcion != "0":
+        mostrar_menu_de_filtro()
+        opcion= input("Elija una opcion: ")
+        match opcion:
+            case "1":
+                filtrar_continente(paises)
+            case "2":
+                pass
+            case "3":
+                pass
+            case "0":
+                print("Volviendo al menu principal")
+            case _:
+                print("Opcion invalida, vuelva a intentarlo")
+    
 def main():
     paises = cargar_paises("paises.csv")
     print(f"Se cargaron {len(paises)} países")
@@ -148,7 +197,7 @@ def main():
             case "3":
                 buscar_pais_por_nombre(paises)
             case "4":
-                pass
+                filtrar_paises(paises)
             case "5":
                 pass
             case "6":
