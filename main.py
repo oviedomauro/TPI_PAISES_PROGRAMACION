@@ -283,7 +283,12 @@ def pais_mas_poblado(paises):
             mayor_poblacion = pais
     return mayor_poblacion
 
-
+def pais_menos_poblado(paises):
+    menor_poblacion = paises[0]
+    for pais in paises:
+        if pais["poblacion"] < menor_poblacion["poblacion"]:
+            menor_poblacion = pais
+    return menor_poblacion
 
 def main():
     paises = cargar_paises("paises.csv")
