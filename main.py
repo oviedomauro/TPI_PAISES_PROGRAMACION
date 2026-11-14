@@ -9,7 +9,7 @@ except ImportError:
     print("Instalalas con este comando y volve a ejecutar:")
     print("python -m pip install -r requirements.txt")
     exit()
-    
+console = Console()
     
 def mostrar_menu():
     print("")
@@ -67,9 +67,22 @@ def mostrar_paises(paises):
     if len(paises) == 0:
         print("No hay paises para mostrar")
         return
-    print("Nombre | Poblacion | Superficie | Continente")
+    tabla = Table(title="Paises", header_style="bold", caption=f"Total: {len(paises)} paises")
+
+    tabla.add_column("Nombre", style="cyan")
+    tabla.add_column("Poblacion", justify="right", style="green")
+    tabla.add_column("Superficie (km2)", justify="right", style="yellow")
+    tabla.add_column("Continente", style="magenta")
+    
     for pais in paises:
-        print(f"{pais['nombre']} | {pais['poblacion']} | {pais['superficie']} | {pais['continente']}")
+        tabla.add_row(
+            pais["nombre"],
+            str(pais["poblacion"]),
+            str(pais["superficie"]),
+            pais["continente"]
+        )
+        
+    console.print(tabla)
 
 def validar_texto(mensaje):
     texto = input(mensaje).strip()
