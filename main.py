@@ -201,7 +201,81 @@ def filtrar_paises(paises):
                 print("Volviendo al menu principal")
             case _:
                 print("Opcion invalida, vuelva a intentarlo")
+
+def ordernar_lista(paises, campo, decendente):
+    lista= []
+    for pais in paises:
+        lista.append(pais)
+    n=len(lista)
     
+    for i in range(n - 1):
+        for j in range(n - i - 1):
+            actual = lista[j][campo]
+            siguiente = lista[j+1][campo]
+            
+            if campo=="nombre":
+                actual = actual.lower()
+                siguiente = siguiente.lower()
+            
+            if decendente:
+                intercambiar = actual < siguiente
+            else:
+                intercambiar = actual > siguiente
+                
+            if intercambiar:
+                aux = lista[j]
+                lista[j] = lista[j + 1]
+                lista[j + 1] = aux
+    return lista
+
+def elegir_sentido_ordenamiento():
+    print("Elija el sentido de ordenamiento:")
+    print("1. Ascendente")
+    print("2. Descendente")
+    opcion = input("Ingrese una opcion: ")
+    match opcion:
+        case "1":
+            return False
+        case "2":
+            return True
+        case _:
+            print("Opcion invalida, vuelva a intentarlo.")
+
+def mostrar_menu_de_ordenamiento():
+    print("Ordenar paises por: ")
+    print("1. Nombre")
+    print("2. Poblacion")
+    print("3. Superficie")
+    print("0. Volver al menu principal")
+
+def mostrar_odernados(paises, campo):
+    decendente = elegir_sentido_ordenamiento()
+    lista_ordenada = ordernar_lista(paises, campo, decendente)
+    
+    if decendente:
+        sentido = "descendente"
+    else:
+        sentido= "ascendente"
+    print(f"Paises ordenados por {campo} ({sentido})")
+    mostrar_paises(lista_ordenada)
+
+def ordenar_paises(paises):
+    opcion = ""
+    while opcion != "0":
+        mostrar_menu_de_ordenamiento()
+        opcion = input("Ingrese una opcion: ")
+        match opcion:
+            case "1":
+                mostrar_odernados(paises, "nombre")
+            case "2":
+                mostrar_odernados(paises, "poblacion")
+            case "3":
+                mostrar_odernados(paises, "superficie")
+            case "0":
+                print("Volviendo al menu principal")
+            case _:
+                print("Opcion invalida, vuelva a intentarlo.")
+
 def main():
     paises = cargar_paises("paises.csv")
     print(f"Se cargaron {len(paises)} países")
@@ -219,7 +293,7 @@ def main():
             case "4":
                 filtrar_paises(paises)
             case "5":
-                pass
+                ordenar_paises(paises)
             case "6":
                 pass
             case "7":
