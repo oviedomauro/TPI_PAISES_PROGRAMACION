@@ -1,3 +1,16 @@
+try:
+    import questionary
+    from questionary import Choice, Separator, Style
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.table import Table
+except ImportError:
+    print("Faltan librerias para ejecutar el programa.")
+    print("Instalalas con este comando y volve a ejecutar:")
+    print("python -m pip install -r requirements.txt")
+    exit()
+    
+    
 def mostrar_menu():
     print("")
     print("Gestion de paises")
