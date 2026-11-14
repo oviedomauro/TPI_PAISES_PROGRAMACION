@@ -276,6 +276,15 @@ def ordenar_paises(paises):
             case _:
                 print("Opcion invalida, vuelva a intentarlo.")
 
+def pais_mas_poblado(paises):
+    mayor_poblacion = paises[0]
+    for pais in paises:
+        if pais["poblacion"] > mayor_poblacion["poblacion"]:
+            mayor_poblacion = pais
+    return mayor_poblacion
+
+
+
 def main():
     paises = cargar_paises("paises.csv")
     print(f"Se cargaron {len(paises)} países")
