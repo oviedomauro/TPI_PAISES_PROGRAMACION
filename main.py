@@ -134,7 +134,7 @@ def agregar_pais(paises):
     nombre = validar_texto("ingrese el nombre del pais: ")
     poblacion = validar_numero(f"Ingrese la poblacion de {nombre}: ")
     superficie = validar_numero(f"Ingrese la superficie de {nombre}: ")
-    continente= validar_texto(f"Ingrese el continente donde se encuentra {nombre}")
+    continente= validar_texto(f"Ingrese el continente donde se encuentra {nombre}: ")
     
     pais= {
         "nombre": nombre,
@@ -186,12 +186,26 @@ def obtener_continentes(paises):
             continentes.append(pais["continente"])
     return continentes
 
-def mostrar_menu_de_filtro():
-    print("Filtrar paises")
-    print("1. Filtrar por continente")
-    print("2. Filtrar por poblacion")
-    print("3. Filtrar por superficie")
-    print("0. Volver al menu principal")
+def elegir_opcion_filtro():
+    console.print(Panel("Filtrar paises", style="bold cyan"))
+
+    opcion = questionary.select(
+        "Filtrar paises por:",
+        choices=[
+            Choice("Continente", value="1", shortcut_key="1"),
+            Choice("Rango de poblacion", value="2", shortcut_key="2"),
+            Choice("Rango de superficie", value="3", shortcut_key="3"),
+            Separator(),
+            Choice("Volver al menu principal", value="0", shortcut_key="0"),
+        ],
+        style=estilo,
+        use_shortcuts=True,
+        instruction="(flechas o numero, y Enter)",
+    ).ask()
+
+    if opcion is None:
+        return "0"
+    return opcion
     
 def filtrar_continente(paises):
     print("Filtrar por continente")
@@ -235,8 +249,7 @@ def filtrar_rango_poblacion_superficie(paises, campo):
 def filtrar_paises(paises):
     opcion= ""
     while opcion != "0":
-        mostrar_menu_de_filtro()
-        opcion= input("Elija una opcion: ")
+        opcion = elegir_opcion_filtro()
         match opcion:
             case "1":
                 filtrar_continente(paises)
@@ -276,25 +289,40 @@ def ordernar_lista(paises, campo, decendente):
     return lista
 
 def elegir_sentido_ordenamiento():
-    while True:
-        print("Elija el sentido de ordenamiento:")
-        print("1. Ascendente")
-        print("2. Descendente")
-        opcion = input("Ingrese una opcion: ")
-        match opcion:
-            case "1":
-                return False
-            case "2":
-                return True
-            case _:
-                print("Opcion invalida, vuelva a intentarlo.")
+    opcion = questionary.select(
+        "Elija el sentido de ordenamiento:",
+        choices=[
+            Choice("Ascendente (de menor a mayor o de la A a la Z)", value="1", shortcut_key="1"),
+            Choice("Descendente (de mayor a menor o de la Z a la A)", value="2", shortcut_key="2"),
+        ],
+        style=estilo,
+        use_shortcuts=True,
+        instruction="(flechas o numero, y Enter)",
+    ).ask()
 
-def mostrar_menu_de_ordenamiento():
-    print("Ordenar paises por: ")
-    print("1. Nombre")
-    print("2. Poblacion")
-    print("3. Superficie")
-    print("0. Volver al menu principal")
+    return opcion == "2"
+
+def elegir_opcion_ordenamiento():
+    console.print(Panel("Ordenar paises", style="bold cyan"))
+
+    opcion = questionary.select(
+        "Ordenar paises por:",
+        choices=[
+            Choice("Nombre", value="1", shortcut_key="1"),
+            Choice("Poblacion", value="2", shortcut_key="2"),
+            Choice("Superficie", value="3", shortcut_key="3"),
+            Separator(),
+            Choice("Volver al menu principal", value="0", shortcut_key="0"),
+        ],
+        style=estilo,
+        use_shortcuts=True,
+        instruction="(flechas o numero, y Enter)",
+    ).ask()
+
+    if opcion is None:
+        return "0"
+    return opcion
+
 
 def mostrar_odernados(paises, campo):
     decendente = elegir_sentido_ordenamiento()
@@ -310,8 +338,7 @@ def mostrar_odernados(paises, campo):
 def ordenar_paises(paises):
     opcion = ""
     while opcion != "0":
-        mostrar_menu_de_ordenamiento()
-        opcion = input("Ingrese una opcion: ")
+        opcion = elegir_opcion_ordenamiento()
         match opcion:
             case "1":
                 mostrar_odernados(paises, "nombre")
