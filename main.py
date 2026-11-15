@@ -10,18 +10,39 @@ except ImportError:
     print("python -m pip install -r requirements.txt")
     exit()
 console = Console()
-    
-def mostrar_menu():
-    print("")
-    print("Gestion de paises")
-    print("1. Agregar pais")
-    print("2. Actualizar pais")
-    print("3. Buscar pais por nombre")
-    print("4. Filtrar paises")
-    print("5. Ordenar paises")
-    print("6. Mostrar estadisticas")
-    print("7. Mostrar todos los paises")
-    print("0. Salir")
+
+estilo = Style([
+    ("qmark", "fg:#00bcd4 bold"),
+    ("question", "bold"),
+    ("pointer", "fg:#ff9800 bold"),
+    ("highlighted", "fg:#ff9800 bold"),
+    ("answer", "fg:#4caf50 bold"),
+])
+
+def elegir_opcion_menu():
+    console.print(Panel("Gestion de paises", style="bold cyan"))
+
+    opcion = questionary.select(
+        "Elegi una opcion:",
+        choices=[
+            Choice("Agregar pais", value="1", shortcut_key="1"),
+            Choice("Actualizar pais", value="2", shortcut_key="2"),
+            Choice("Buscar pais por nombre", value="3", shortcut_key="3"),
+            Choice("Filtrar paises", value="4", shortcut_key="4"),
+            Choice("Ordenar paises", value="5", shortcut_key="5"),
+            Choice("Mostrar estadisticas", value="6", shortcut_key="6"),
+            Choice("Mostrar todos los paises", value="7", shortcut_key="7"),
+            Separator(),
+            Choice("Salir", value="0", shortcut_key="0"),
+        ],
+        style=estilo,
+        use_shortcuts=True,
+        instruction="(flechas o numero, y Enter)",
+    ).ask()
+
+    if opcion is None:
+        return "0"
+    return opcion
 
 
 def cargar_paises(ruta):
@@ -372,8 +393,7 @@ def main():
     print(f"Se cargaron {len(paises)} países")
     opcion = ""
     while opcion != "0":
-        mostrar_menu()
-        opcion = input("Elegi una opcion: ")
+        opcion = elegir_opcion_menu()
         match opcion:
             case "1":
                 agregar_pais(paises)
