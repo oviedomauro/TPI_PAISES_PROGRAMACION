@@ -1,14 +1,57 @@
-def mostrar_menu():
-    print("")
-    print("Gestion de paises")
-    print("1. Agregar pais")
-    print("2. Actualizar pais")
-    print("3. Buscar pais por nombre")
-    print("4. Filtrar paises")
-    print("5. Ordenar paises")
-    print("6. Mostrar estadisticas")
-    print("7. Mostrar todos los paises")
-    print("0. Salir")
+try:
+    import questionary
+    from questionary import Choice, Separator, Style
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.table import Table
+except ImportError:
+    print("Faltan librerias para ejecutar el programa.")
+    print("Instalalas con este comando y volve a ejecutar:")
+    print("python -m pip install -r requirements.txt")
+    exit()
+console = Console()
+
+estilo = Style([
+    ("qmark", "fg:#00bcd4 bold"),
+    ("question", "bold"),
+    ("pointer", "fg:#ff9800 bold"),
+    ("highlighted", "fg:#ff9800 bold"),
+    ("answer", "fg:#4caf50 bold"),
+])
+
+def mostrar_mensaje_exito(mensaje):
+    console.print(mensaje, style="bold green", markup=False, highlight=False)
+
+def mostrar_mensaje_error(mensaje):
+    console.print(mensaje, style="bold red", markup=False, highlight=False)
+
+def mostrar_mensaje_aviso(mensaje):
+    console.print(mensaje, style="yellow", markup=False, highlight=False)
+
+def elegir_opcion_menu():
+    console.print(Panel("Gestion de paises", style="bold cyan"))
+
+    opcion = questionary.select(
+        "Elegi una opcion:",
+        choices=[
+            Choice("Agregar pais", value="1", shortcut_key="1"),
+            Choice("Actualizar pais", value="2", shortcut_key="2"),
+            Choice("Buscar pais por nombre", value="3", shortcut_key="3"),
+            Choice("Filtrar paises", value="4", shortcut_key="4"),
+            Choice("Ordenar paises", value="5", shortcut_key="5"),
+            Choice("Mostrar estadisticas", value="6", shortcut_key="6"),
+            Choice("Mostrar todos los paises", value="7", shortcut_key="7"),
+            Separator(),
+            Choice("Salir", value="0", shortcut_key="0"),
+        ],
+        style=estilo,
+        use_shortcuts=True,
+        instruction="(flechas o numero, y Enter)",
+    ).ask()
+
+    if opcion is None:
+        return "0"
+    return opcion
 
 
 def cargar_paises(ruta):
@@ -17,7 +60,7 @@ def cargar_paises(ruta):
         with open(ruta, "r", encoding="utf-8") as archivo:
             lineas = archivo.readlines()
     except FileNotFoundError:
-        print(f"Error: no se encontró el archivo {ruta}")
+        mostrar_mensaje_error(f"Error: no se encontró el archivo {ruta}")
         return paises
 
     for i in range(1, len(lineas)):
@@ -27,19 +70,19 @@ def cargar_paises(ruta):
 
         partes = linea.split(",")
         if len(partes) != 4:
-            print(f"Linea {i + 1} ignorada: formato incorrecto")
+            mostrar_mensaje_aviso(f"Linea {i + 1} ignorada: formato incorrecto")
             continue
         
         nombre = partes[0].strip()
         continente = partes[3].strip()
         if nombre == "" or continente == "":
-            print(f"Línea {i + 1} ignorada: hay campos vacíos")
+            mostrar_mensaje_aviso(f"Línea {i + 1} ignorada: hay campos vacíos")
             continue
         try:
             poblacion = int(partes[1])
             superficie = int(partes[2])
         except ValueError:
-            print(f"Línea {i + 1} ignorada: población o superficie no son números")
+            mostrar_mensaje_error(f"Línea {i + 1} ignorada: población o superficie no son números")
             continue
         pais = {
             "nombre": nombre,
@@ -52,16 +95,29 @@ def cargar_paises(ruta):
 
 def mostrar_paises(paises):
     if len(paises) == 0:
-        print("No hay paises para mostrar")
+        mostrar_mensaje_aviso("No hay paises para mostrar")
         return
-    print("Nombre | Poblacion | Superficie | Continente")
+    tabla = Table(title="Paises", header_style="bold", caption=f"Total: {len(paises)} paises")
+
+    tabla.add_column("Nombre", style="cyan")
+    tabla.add_column("Poblacion", justify="right", style="green")
+    tabla.add_column("Superficie (km2)", justify="right", style="yellow")
+    tabla.add_column("Continente", style="magenta")
+    
     for pais in paises:
-        print(f"{pais['nombre']} | {pais['poblacion']} | {pais['superficie']} | {pais['continente']}")
+        tabla.add_row(
+            pais["nombre"],
+            str(pais["poblacion"]),
+            str(pais["superficie"]),
+            pais["continente"]
+        )
+        
+    console.print(tabla)
 
 def validar_texto(mensaje):
     texto = input(mensaje).strip()
     while texto == "":
-        print("Error: No puede estar vacio el campo")
+        mostrar_mensaje_error("Error: No puede estar vacio el campo")
         texto = input(mensaje).strip()
     return texto
 
@@ -71,13 +127,13 @@ def validar_numero(mensaje):
         try:
             numero = int(dato)
         except ValueError:
-            print("Error: Debe ingresar un numero entero")
+            mostrar_mensaje_error("Error: Debe ingresar un numero entero")
             continue
         if numero < 0:
-            print("Error: Debe ingresar un numero entero positivo")
+            mostrar_mensaje_error("Error: Debe ingresar un numero entero positivo")
             continue
         if numero <= 0:
-            print("Error: Debe ingresar un numero entero mayor a cero")
+            mostrar_mensaje_error("Error: Debe ingresar un numero entero mayor a cero")
             continue
         return numero
     
@@ -87,7 +143,7 @@ def agregar_pais(paises):
     nombre = validar_texto("ingrese el nombre del pais: ")
     poblacion = validar_numero(f"Ingrese la poblacion de {nombre}: ")
     superficie = validar_numero(f"Ingrese la superficie de {nombre}: ")
-    continente= validar_texto(f"Ingrese el continente donde se encuentra {nombre}")
+    continente= validar_texto(f"Ingrese el continente donde se encuentra {nombre}: ")
     
     pais= {
         "nombre": nombre,
@@ -96,7 +152,7 @@ def agregar_pais(paises):
         "continente": continente
     }
     paises.append(pais)
-    print(f"Se agrego el pais: {nombre} correctamente")
+    mostrar_mensaje_exito(f"Se agrego el pais: {nombre} correctamente")
 
 def buscar_porcision(paises, nombre):
     for i in range(len(paises)):
@@ -109,7 +165,7 @@ def actualizar_pais(paises):
     nombre=validar_texto("Ingrese el nombre del pais que desea actualizar: ")
     posicion =buscar_porcision(paises, nombre)
     if posicion ==-1:
-        print(f"Error; no se encontro el pais ingresado: {nombre}")
+        mostrar_mensaje_error(f"Error; no se encontro el pais ingresado: {nombre}")
         return
     pais=paises[posicion]
     print(f"Datos actuales: {pais['nombre']} | {pais['poblacion']} | {pais['superficie']} | {pais['continente']}")
@@ -118,7 +174,7 @@ def actualizar_pais(paises):
     
     pais["poblacion"] = nueva_poblacion
     pais["superficie"] = nueva_superficie
-    print(f"Los datos del pais {pais['nombre']} se actualizaron correctamente")
+    mostrar_mensaje_exito(f"Los datos del pais {pais['nombre']} se actualizaron correctamente")
 
 def buscar_pais_por_nombre(paises):
     print(f"Buscar pais por nombre")
@@ -128,10 +184,11 @@ def buscar_pais_por_nombre(paises):
         if nombre.lower() in pais["nombre"].lower():
             resultados.append(pais)
     if len(resultados) ==0:
-        print(f"No se ha encontrado ningun pais que contenga: {nombre}")
+        mostrar_mensaje_aviso(f"No se ha encontrado ningun pais que contenga: {nombre}")
     else:
-        print(f"Se han encontrado {len(resultados)} paises que contienen: {nombre}")
+        mostrar_mensaje_exito(f"Se han encontrado {len(resultados)} paises que contienen: {nombre}")
         mostrar_paises(resultados)
+
 def obtener_continentes(paises):
     continentes=[]
     for pais in paises:
@@ -139,12 +196,26 @@ def obtener_continentes(paises):
             continentes.append(pais["continente"])
     return continentes
 
-def mostrar_menu_de_filtro():
-    print("Filtrar paises")
-    print("1. Filtrar por continente")
-    print("2. Filtrar por poblacion")
-    print("3. Filtrar por superficie")
-    print("0. Volver al menu principal")
+def elegir_opcion_filtro():
+    console.print(Panel("Filtrar paises", style="bold cyan"))
+
+    opcion = questionary.select(
+        "Filtrar paises por:",
+        choices=[
+            Choice("Continente", value="1", shortcut_key="1"),
+            Choice("Rango de poblacion", value="2", shortcut_key="2"),
+            Choice("Rango de superficie", value="3", shortcut_key="3"),
+            Separator(),
+            Choice("Volver al menu principal", value="0", shortcut_key="0"),
+        ],
+        style=estilo,
+        use_shortcuts=True,
+        instruction="(flechas o numero, y Enter)",
+    ).ask()
+
+    if opcion is None:
+        return "0"
+    return opcion
     
 def filtrar_continente(paises):
     print("Filtrar por continente")
@@ -160,9 +231,9 @@ def filtrar_continente(paises):
             resultados.append(pais)
             
     if len(resultados)==0:
-        print(f"No se han encontrado paises en el continente: {continente}")
+        mostrar_mensaje_aviso(f"No se han encontrado paises en el continente: {continente}")
     else:
-        print(f"Se han encontrado {len(resultados)} paises en el continente: {continente}")
+        mostrar_mensaje_exito(f"Se han encontrado {len(resultados)} paises en el continente: {continente}")
         mostrar_paises(resultados)
         
 def filtrar_rango_poblacion_superficie(paises, campo):
@@ -171,7 +242,7 @@ def filtrar_rango_poblacion_superficie(paises, campo):
     max = validar_numero(f"Ingrese el valor maximo de {campo}: ")
     
     if min > max:
-        print(f"Error: el minimo ({min}) no puede ser mayor que el maximo ({max})")
+        mostrar_mensaje_error(f"Error: el minimo ({min}) no puede ser mayor que el maximo ({max})")
         return
     resultados = []
     
@@ -180,16 +251,15 @@ def filtrar_rango_poblacion_superficie(paises, campo):
             resultados.append(pais)
             
     if len(resultados)==0:
-        print(f"No se han encontrado paises con {campo} entre {min} y {max}")
+        mostrar_mensaje_aviso(f"No se han encontrado paises con {campo} entre {min} y {max}")
     else:
-        print(f"Se han encontrado {len(resultados)} paises con {campo} entre {min} y {max}")
+        mostrar_mensaje_exito(f"Se han encontrado {len(resultados)} paises con {campo} entre {min} y {max}")
         mostrar_paises(resultados)
 
 def filtrar_paises(paises):
     opcion= ""
     while opcion != "0":
-        mostrar_menu_de_filtro()
-        opcion= input("Elija una opcion: ")
+        opcion = elegir_opcion_filtro()
         match opcion:
             case "1":
                 filtrar_continente(paises)
@@ -198,9 +268,9 @@ def filtrar_paises(paises):
             case "3":
                 filtrar_rango_poblacion_superficie(paises, "superficie")
             case "0":
-                print("Volviendo al menu principal")
+                mostrar_mensaje_exito("Volviendo al menu principal")
             case _:
-                print("Opcion invalida, vuelva a intentarlo")
+                mostrar_mensaje_error("Opcion invalida, vuelva a intentarlo")
 
 def ordernar_lista(paises, campo, decendente):
     lista= []
@@ -229,25 +299,39 @@ def ordernar_lista(paises, campo, decendente):
     return lista
 
 def elegir_sentido_ordenamiento():
-    while True:
-        print("Elija el sentido de ordenamiento:")
-        print("1. Ascendente")
-        print("2. Descendente")
-        opcion = input("Ingrese una opcion: ")
-        match opcion:
-            case "1":
-                return False
-            case "2":
-                return True
-            case _:
-                print("Opcion invalida, vuelva a intentarlo.")
+    opcion = questionary.select(
+        "Elija el sentido de ordenamiento:",
+        choices=[
+            Choice("Ascendente (de menor a mayor o de la A a la Z)", value="1", shortcut_key="1"),
+            Choice("Descendente (de mayor a menor o de la Z a la A)", value="2", shortcut_key="2"),
+        ],
+        style=estilo,
+        use_shortcuts=True,
+        instruction="(flechas o numero, y Enter)",
+    ).ask()
 
-def mostrar_menu_de_ordenamiento():
-    print("Ordenar paises por: ")
-    print("1. Nombre")
-    print("2. Poblacion")
-    print("3. Superficie")
-    print("0. Volver al menu principal")
+    return opcion == "2"
+
+def elegir_opcion_ordenamiento():
+    console.print(Panel("Ordenar paises", style="bold cyan"))
+
+    opcion = questionary.select(
+        "Ordenar paises por:",
+        choices=[
+            Choice("Nombre", value="1", shortcut_key="1"),
+            Choice("Poblacion", value="2", shortcut_key="2"),
+            Choice("Superficie", value="3", shortcut_key="3"),
+            Separator(),
+            Choice("Volver al menu principal", value="0", shortcut_key="0"),
+        ],
+        style=estilo,
+        use_shortcuts=True,
+        instruction="(flechas o numero, y Enter)",
+    ).ask()
+
+    if opcion is None:
+        return "0"
+    return opcion
 
 def mostrar_odernados(paises, campo):
     decendente = elegir_sentido_ordenamiento()
@@ -263,8 +347,7 @@ def mostrar_odernados(paises, campo):
 def ordenar_paises(paises):
     opcion = ""
     while opcion != "0":
-        mostrar_menu_de_ordenamiento()
-        opcion = input("Ingrese una opcion: ")
+        opcion = elegir_opcion_ordenamiento()
         match opcion:
             case "1":
                 mostrar_odernados(paises, "nombre")
@@ -273,9 +356,9 @@ def ordenar_paises(paises):
             case "3":
                 mostrar_odernados(paises, "superficie")
             case "0":
-                print("Volviendo al menu principal")
+                mostrar_mensaje_exito("Volviendo al menu principal")
             case _:
-                print("Opcion invalida, vuelva a intentarlo.")
+                mostrar_mensaje_error("Opcion invalida, vuelva a intentarlo.")
 
 def pais_mas_poblado(paises):
     mayor_poblacion = paises[0]
@@ -324,7 +407,7 @@ def contar_paises_por_continente(paises):
 def mostrar_estadisticas(paises):
     print("Estadisticas de paises")
     if len(paises)==0:
-        print("No hay paises cargados para mostrar estadisticas")
+        mostrar_mensaje_aviso("No hay paises cargados para mostrar estadisticas")
         return
     
     mayor_poblado = pais_mas_poblado(paises)
@@ -346,8 +429,7 @@ def main():
     print(f"Se cargaron {len(paises)} países")
     opcion = ""
     while opcion != "0":
-        mostrar_menu()
-        opcion = input("Elegi una opcion: ")
+        opcion = elegir_opcion_menu()
         match opcion:
             case "1":
                 agregar_pais(paises)
@@ -367,5 +449,5 @@ def main():
                 print("Saliendo del programa...")
                 break
             case _:
-                print("Opcion invalida , vuelva a intentarlo")
+                mostrar_mensaje_error("Opcion invalida , vuelva a intentarlo")
 main()
