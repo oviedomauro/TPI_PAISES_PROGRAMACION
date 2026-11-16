@@ -141,6 +141,9 @@ def agregar_pais(paises):
     print("")
     print("Agregar pais")
     nombre = validar_texto("ingrese el nombre del pais: ")
+    if buscar_porcision(paises, nombre) != -1:
+        mostrar_mensaje_error(f"Error: el pais {nombre} ya existe en la lista")
+        return
     poblacion = validar_numero(f"Ingrese la poblacion de {nombre}: ")
     superficie = validar_numero(f"Ingrese la superficie de {nombre}: ")
     continente= validar_texto(f"Ingrese el continente donde se encuentra {nombre}: ")
