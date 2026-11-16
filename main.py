@@ -111,6 +111,17 @@ def cargar_paises(ruta):
         paises.append(pais)
     return paises
 
+def guardar_paises(paises, ruta):
+    try:
+        with open(ruta, "w", encoding="utf-8") as archivo:
+            archivo.write("nombre,poblacion,superficie,continente\n")
+            for pais in paises:
+                archivo.write(f"{pais['nombre']},{pais['poblacion']},{pais['superficie']},{pais['continente']}\n")
+        return True
+    except OSError as e:
+        mostrar_mensaje_error(f"Error al guardar el archivo {ruta}: {e}")
+        return False
+
 def mostrar_paises(paises):
     if len(paises) == 0:
         mostrar_mensaje_aviso("No hay paises para mostrar")
@@ -154,17 +165,24 @@ def validar_numero(mensaje):
             mostrar_mensaje_error("Error: Debe ingresar un numero entero mayor a cero")
             continue
         return numero
-    
+
+def texto_sin_coma(mensaje):
+    texto = validar_texto(mensaje)
+    while "," in texto:
+        mostrar_mensaje_error("Error: No puede contener comas")
+        texto = validar_texto(mensaje)
+    return texto
+
 def agregar_pais(paises):
     print("")
     print("Agregar pais")
-    nombre = validar_texto("ingrese el nombre del pais: ")
+    nombre = texto_sin_coma("ingrese el nombre del pais: ")
     if buscar_porcision(paises, nombre) != -1:
         mostrar_mensaje_error(f"Error: el pais {nombre} ya existe en la lista")
         return
     poblacion = validar_numero(f"Ingrese la poblacion de {nombre}: ")
     superficie = validar_numero(f"Ingrese la superficie de {nombre}: ")
-    continente= validar_texto(f"Ingrese el continente donde se encuentra {nombre}: ")
+    continente= texto_sin_coma(f"Ingrese el continente donde se encuentra {nombre}: ")
     
     pais= {
         "nombre": nombre,
@@ -173,7 +191,8 @@ def agregar_pais(paises):
         "continente": continente
     }
     paises.append(pais)
-    mostrar_mensaje_exito(f"Se agrego el pais: {nombre} correctamente")
+    if guardar_paises(paises, "paises.csv"):
+        mostrar_mensaje_exito(f"Se agrego el pais {nombre} y se guardo en el archivo")
 
 def buscar_porcision(paises, nombre):
     for i in range(len(paises)):
@@ -195,7 +214,8 @@ def actualizar_pais(paises):
     
     pais["poblacion"] = nueva_poblacion
     pais["superficie"] = nueva_superficie
-    mostrar_mensaje_exito(f"Los datos del pais {pais['nombre']} se actualizaron correctamente")
+    if guardar_paises(paises, "paises.csv"):
+        mostrar_mensaje_exito("Los cambios se guardaron correctamente en el archivo paises.csv")
 
 def buscar_pais_por_nombre(paises):
     print(f"Buscar pais por nombre")
