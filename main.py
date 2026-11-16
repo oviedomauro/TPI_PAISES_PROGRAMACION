@@ -53,15 +53,25 @@ def elegir_opcion_menu():
         return "0"
     return opcion
 
-
 def cargar_paises(ruta):
     paises = []
     try:
-        with open(ruta, "r", encoding="utf-8") as archivo:
+        with open(ruta, "r", encoding="utf-8-sig") as archivo:
             lineas = archivo.readlines()
     except FileNotFoundError:
-        mostrar_mensaje_error(f"Error: no se encontró el archivo {ruta}")
+        mostrar_mensaje_error(f"Error: no se encontro el archivo {ruta}")
         return paises
+    except UnicodeDecodeError:
+        mostrar_mensaje_error(f"Error: el archivo {ruta} no esta guardado en formato UTF-8")
+        return paises
+
+    if len(lineas) == 0:
+        mostrar_mensaje_error(f"Error: el archivo {ruta} esta vacio")
+        return paises
+
+    encabezado = lineas[0].strip().lower().replace(" ", "")
+    if encabezado != "nombre,poblacion,superficie,continente":
+        mostrar_mensaje_aviso("Aviso: la primera linea no es el encabezado esperado (nombre,poblacion,superficie,continente) y se ignora")
 
     for i in range(1, len(lineas)):
         linea = lineas[i].strip()
@@ -72,17 +82,25 @@ def cargar_paises(ruta):
         if len(partes) != 4:
             mostrar_mensaje_aviso(f"Linea {i + 1} ignorada: formato incorrecto")
             continue
-        
+
         nombre = partes[0].strip()
         continente = partes[3].strip()
         if nombre == "" or continente == "":
-            mostrar_mensaje_aviso(f"Línea {i + 1} ignorada: hay campos vacíos")
+            mostrar_mensaje_aviso(f"Linea {i + 1} ignorada: hay campos vacios")
             continue
         try:
             poblacion = int(partes[1])
             superficie = int(partes[2])
         except ValueError:
-            mostrar_mensaje_error(f"Línea {i + 1} ignorada: población o superficie no son números")
+            mostrar_mensaje_aviso(f"Linea {i + 1} ignorada: poblacion o superficie no son numeros")
+            continue
+
+        if poblacion <= 0 or superficie <= 0:
+            mostrar_mensaje_aviso(f"Linea {i + 1} ignorada: poblacion y superficie deben ser mayores a cero")
+            continue
+
+        if buscar_porcision(paises, nombre) != -1:
+            mostrar_mensaje_aviso(f"Linea {i + 1} ignorada: el pais {nombre} esta repetido")
             continue
         pais = {
             "nombre": nombre,
@@ -221,7 +239,7 @@ def elegir_opcion_filtro():
     return opcion
     
 def filtrar_continente(paises):
-    print("Filtrar por continente")
+    print(f"Filtrar por continente")
     print("Continentes disponibles:")
     
     for continente in obtener_continentes(paises):
@@ -241,22 +259,22 @@ def filtrar_continente(paises):
         
 def filtrar_rango_poblacion_superficie(paises, campo):
     print(f"Filtrar por {campo}")
-    min = validar_numero(f"Ingrese el valor minimo de {campo}: ")
-    max = validar_numero(f"Ingrese el valor maximo de {campo}: ")
+    minimo = validar_numero(f"Ingrese el valor minimo de {campo}: ")
+    maximo = validar_numero(f"Ingrese el valor maximo de {campo}: ")
     
-    if min > max:
-        mostrar_mensaje_error(f"Error: el minimo ({min}) no puede ser mayor que el maximo ({max})")
+    if minimo > maximo:
+        mostrar_mensaje_error(f"Error: el minimo ({minimo}) no puede ser mayor que el maximo ({maximo})")
         return
     resultados = []
     
     for pais in paises:
-        if pais[campo] >= min and pais[campo]<= max:
+        if pais[campo] >= minimo and pais[campo]<= maximo:
             resultados.append(pais)
             
     if len(resultados)==0:
-        mostrar_mensaje_aviso(f"No se han encontrado paises con {campo} entre {min} y {max}")
+        mostrar_mensaje_aviso(f"No se han encontrado paises con {campo} entre {minimo} y {maximo}")
     else:
-        mostrar_mensaje_exito(f"Se han encontrado {len(resultados)} paises con {campo} entre {min} y {max}")
+        mostrar_mensaje_exito(f"Se han encontrado {len(resultados)} paises con {campo} entre {minimo} y {maximo}")
         mostrar_paises(resultados)
 
 def filtrar_paises(paises):
