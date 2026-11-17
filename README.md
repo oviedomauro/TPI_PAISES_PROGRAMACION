@@ -127,4 +127,4 @@ La primera linea es el encabezado. El archivo debe estar guardado en UTF-8 ni el
 ## Enlaces
 
 - **Video demostrativo:**  https://youtu.be/4FfXxJNJU6c
-- **Documentacion en PDF:** file:///C:/Users/Mauro%20Oviedo/Downloads/tpi,oviedo_mauro.pdf
+- **Documentacion en PDF:** https://drive.google.com/file/d/14K5HMKiXK8BPuNmyYrVBGzajdrT-37r_/view?usp=sharing
